@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>تفعيل إشعارات الحضور</title>
+  <meta name="theme-color" content="#0ea5e9">
+    <!-- Link the Web App manifest. Icons can be omitted for root deployment -->
+    <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="stylesheet" href="css/style.css">
+  <!-- OneSignal SDK -->
+  <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+  <script defer src="config.js"></script>
+  <script>
+    window.OneSignalDeferred = window.OneSignalDeferred || [];
+    OneSignalDeferred.push(async function(OneSignal) {
+      // Get App ID from config.js
+      const APP_ID = (window.APP_CONFIG && window.APP_CONFIG.ONE_SIGNAL_APP_ID) || "";
+      // Initialize OneSignal with custom Service Worker paths.
+      await OneSignal.init({
+        appId: APP_ID,
+        serviceWorker: {
+          // Because this site is hosted from the root of the domain, the service
+          // worker files live in the same directory as this page.  When specifying
+          // a custom path, omit the leading slash so it's relative to the
+          // current directory.  Set the scope to '/' so the worker can control
+          // all pages on the site.
+          path: 'OneSignalSDKWorker.js',
+          updaterPath: 'OneSignalSDKUpdaterWorker.js',
+          scope: '/'
+        }
+      });
+      const $ = s => document.querySelector(s);
+      const status = document.querySelector('#status');
+      const email  = document.querySelector('#email');
+      const q = document.querySelector('#q');
+      if (q && window.APP_CONFIG) q.textContent = window.APP_CONFIG.NOTIFY_TEXT || "";
+      async function refresh(){
+        try{
+          const canSend = await OneSignal.Notifications.canSendPush();
+          const perm = await OneSignal.Notifications.permission;
+          status.textContent = canSend ? "\u0627\u0644\u0625\u0634\u0639\u0627\u0631\u0627\u062a \u0645\u0641\u0639\u0651\u0644\u0629 \u2705" :
+            (perm === "denied" ? "\u0627\u0644\u0625\u0634\u0639\u0627\u0631\u0627\u062a \u0645\u0631\u0641\u0648\u0636\u0629 \u0645\u0646 \u0627\u0644\u0645\u062a\u0635\u0641\u062d \u274c" :
+              "\u0627\u0644\u0625\u0634\u0639\u0627\u0631\u0627\u062a \u0644\u0633\u0647 \u0645\u0634 \u0645\u0641\u0639\u0651\u0644\u0629.");
+        }catch(e){ status.textContent = "\u0644\u0627 \u064a\u0645\u0643\u0646 \u062a\u062d\u062f\u064a\u062f \u0627\u0644\u062d\u0627\u0644\u0629 \u0627\u0644\u0622\u0646."; }
+      }
+      document.querySelector('#btn-sub').addEventListener("click", async () => {
+        const val = email.value.trim();
+        if(!val){ status.textContent = "\u0627\u0643\u062a\u0628 \u0627\u0644\u0625\u064a\u0645\u064a\u0644 \u0627\u0644\u0648\u0638\u064a\u0641\u064a."; return; }
+        try{
+          await OneSignal.login(val);
+          const res = await OneSignal.Notifications.requestPermission();
+          status.textContent = (res === "granted") ? "\u062a\u0645 \u0627\u0644\u062a\u0641\u0639\u064a\u0644 " : "\u0644\u0627\u0632\u0645 \u062a\u0648\u0627\u0641\u0642 \u0639\u0644\u0649 \u0627\u0644\u0625\u0630\u0646.";
+        }catch(e){ status.textContent = "\u062d\u0635\u0644 \u062e\u0637\u0623 \u0623\u062b\u0646\u0627\u0621 \u0627\u0644\u062a\u0641\u0639\u064a\u0644."; }
+        refresh();
+      });
+      document.querySelector('#btn-unsub').addEventListener("click", async () => {
+        try{
+          await OneSignal.logout();
+          status.textContent = "\u062a\u0645 \u0625\u0644\u063a\u0627\u0621 \u0627\u0644\u0631\u0628\u0637. \u0644\u0625\u064a\u0642\u0627\u0641 \u0627\u0644\u0625\u0634\u0639\u0627\u0631\u0627\u062a \u0646\u0647\u0627\u0626\u064a\u064b\u0627 \u0639\u0637\u0644 \u0627\u0644\u0625\u0630\u0646 \u0645\u0646 \u0625\u0639\u062f\u0627\u062f\u0627\u062a \u0627\u0644\u0645\u0648\u0642\u0639.";
+        }catch(e){}
+      });
+      refresh();
+    });
+  </script>
+</head>
+<body>
+  <main class="container">
+    <h1>تفعيل إشعارات الحضور</h1>
+    <section class="card">
+      <p>اكتب الإيميل واضغط <b>تفعيل الإشعارات</b>. السؤال اليومي: <q id="q"></q></p>
+      <label>الإيميل الوظيفي</label>
+      <input id="email" type="email" placeholder="you@company.com" autocomplete="email" />
+      <div class="row">
+        <button id="btn-sub" class="primary">تفعيل الإشعارات</button>
+        <button id="btn-unsub" class="danger">إلغاء الاشتراك</button>
+      </div>
+      <p class="hint">iPhone: أول مرة لازم Add to Home Screen وافتح من الأيقونة ثم وافق على الإذن.</p>
+      <p id="status" class="status"></p>
+    </section>
+  </main>
+</body>
+</html>

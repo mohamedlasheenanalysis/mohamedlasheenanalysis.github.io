@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>تفعيل إشعارات الحضور</title>
   <meta name="theme-color" content="#0ea5e9">
-    <!-- Link the Web App manifest. Icons can be omitted for root deployment -->
-    <link rel="manifest" href="manifest.json">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="stylesheet" href="css/style.css">
@@ -22,15 +22,15 @@
       await OneSignal.init({
         appId: APP_ID,
         serviceWorker: {
-          // Because this site is hosted from the root of the domain, the service
-          // worker files live in the same directory as this page.  When specifying
+          // Because this site is hosted under /Attendance/, the service worker
+          // file lives at /Attendance/OneSignalSDKWorker.js.  When specifying
           // a custom path, omit the leading slash so it's relative to the
-          // current directory.  Set the scope to '/' so the worker can control
-          // all pages on the site.
+          // current directory.  The scope must not exceed the parent
+          // directory of the worker.  Using "/Attendance/" ensures the
+          // service worker controls pages under this folder.
           path: 'OneSignalSDKWorker.js',
-          // Note: updaterPath is optional and only used to check for updates.
-          // We omit it here since we don't provide a separate updater worker file.
-          scope: '/'
+          updaterPath: 'OneSignalSDKUpdaterWorker.js',
+          scope: '/Attendance/'
         }
       });
       const $ = s => document.querySelector(s);

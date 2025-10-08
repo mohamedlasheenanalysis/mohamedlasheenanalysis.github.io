@@ -42,12 +42,11 @@
         await OneSignal.init({
           appId: window.APP_CONFIG.ONE_SIGNAL_APP_ID,
           serviceWorker: {
-            // Custom scope for the service worker. Since the site runs at the
-            // root of the domain, the worker lives alongside this file and
-            // controls all paths. Use '/' for the scope.
+            // Custom scope for the service worker. Since the site runs
+            // within `/Attendance/`, the scope must be within that path.
             path: 'OneSignalSDKWorker.js',
-            // No separate updater worker file needed; omit updaterPath.
-            scope: '/'
+            updaterPath: 'OneSignalSDKUpdaterWorker.js',
+            scope: '/Attendance/'
           }
         });
         // Auto-send if answer is provided in the URL

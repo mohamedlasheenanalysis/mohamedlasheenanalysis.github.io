@@ -1,0 +1,9 @@
+{
+  "name": "تصويت الحضور",
+  "short_name": "الحضور",
+  // Start the PWA from the current folder. For subpaths, adjust accordingly.
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#0ea5e9",
+  "theme_color": "#0ea5e9"
+}

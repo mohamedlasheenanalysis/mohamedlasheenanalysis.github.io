@@ -1,0 +1,88 @@
+/* Simple styling for attendance PWA */
+body {
+  font-family: system-ui, 'Segoe UI', Tahoma, sans-serif;
+  background: #020617;
+  color: #f1f5f9;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 480px;
+  width: 100%;
+  padding: 2rem;
+}
+
+.card {
+  background: #0f172a;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.row {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+button {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.primary {
+  background: #0ea5e9;
+  color: white;
+}
+.primary:hover { background: #0284c7; }
+
+.danger {
+  background: #f43f5e;
+  color: white;
+}
+.danger:hover { background: #be123c; }
+
+.ghost {
+  background: transparent;
+  border: 2px solid #64748b;
+  color: #e2e8f0;
+}
+.ghost:hover {
+  background: #1e293b;
+}
+
+input[type="email"] {
+  width: 100%;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 8px;
+  margin-top: 0.5rem;
+  background: #1e293b;
+  color: #e2e8f0;
+}
+
+label {
+  font-weight: bold;
+  margin-top: 1rem;
+  display: block;
+}
+
+.status {
+  margin-top: 1rem;
+  font-weight: bold;
+}
+
+.hint {
+  font-size: 0.85rem;
+  color: #94a3b8;
+}

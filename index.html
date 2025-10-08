@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>تفعيل إشعارات الحضور</title>
+  <meta name="theme-color" content="#0ea5e9">
+    <!-- Link the Web App manifest. Icons can be omitted for root deployment -->
+    <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="stylesheet" href="css/style.css">
+  <!-- OneSignal SDK -->
+  <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+  <script defer src="config.js"></script>
+  <script>
+    window.OneSignalDeferred = window.OneSignalDeferred || [];
+    OneSignalDeferred.push(async function(OneSignal) {
+      // Get App ID from config.js
+      const APP_ID = (window.APP_CONFIG && window.APP_CONFIG.ONE_SIGNAL_APP_ID) || "";
+      // Initialize OneSignal with custom Service Worker paths.
+      await OneSignal.init({
+        appId: APP_ID,
+        serviceWorker: {
+          // Because this site is hosted from the root of the domain, the service
+          // worker files live in the same directory as this page.  When specifying
+          // a custom path, omit the leading slash so it's relative to the
+          // current directory.  Set the scope to '/' so the worker can control
+          // all pages on the site.
+          path: 'OneSignalSDKWorker.js',
+          // Note: updaterPath is optional and only used to check for updates.
+          // We omit it here since we don't provide a separate updater worker file.
+          scope: '/'
+        }
+      });
+      const $ = s => document.querySelector(s);
+      const status = $("#status");
+      const email  = $("#email");
+      const q = $("#q");
+      if (q && window.APP_CONFIG) q.textContent = window.APP_CONFIG.NOTIFY_TEXT || "";
+      async function refresh(){
+        try{
+          const canSend = await OneSignal.Notifications.canSendPush();
+          const perm = await OneSignal.Notifications.permission;
+          status.textContent = canSend ? "الإشعارات مفعّلة ✅" :
+            (perm === "denied" ? "الإشعارات مرفوضة من المتصفح ❌" :
+              "الإشعارات لسه مش مفعّلة.");
+        }catch(e){ status.textContent = "لا يمكن تحديد الحالة الآن."; }
+      }
+      $("#btn-sub").addEventListener("click", async () => {
+        const val = email.value.trim();
+        if(!val){ status.textContent = "اكتب الإيميل الوظيفي."; return; }
+        try{
+          await OneSignal.login(val);
+          const res = await OneSignal.Notifications.requestPermission();
+          status.textContent = (res === "granted") ? "تم التفعيل " : "لازم توافق على الإذن.";
+        }catch(e){ status.textContent = "حصل خطأ أثناء التفعيل."; }
+        refresh();
+      });
+      $("#btn-unsub").addEventListener("click", async () => {
+        try{
+          await OneSignal.logout();
+          status.textContent = "تم إلغاء الربط. لإيقاف الإشعارات نهائيًا عطّل الإذن من إعدادات الموقع.";
+        }catch(e){}
+      });
+      refresh();
+    });
+  </script>
+</head>
+<body>
+  <main class="container">
+    <h1>تفعيل إشعارات الحضور</h1>
+    <section class="card">
+      <p>اكتب الإيميل واضغط <b>تفعيل الإشعارات</b>. السؤال اليومي: <q id="q"></q></p>
+      <label>الإيميل الوظيفي</label>
+      <input id="email" type="email" placeholder="you@company.com" autocomplete="email" />
+      <div class="row">
+        <button id="btn-sub" class="primary">تفعيل الإشعارات</button>
+        <button id="btn-unsub" class="danger">إلغاء الاشتراك</button>
+      </div>
+      <p class="hint">iPhone: أول مرة لازم Add to Home Screen وافتح من الأيقونة ثم وافق على الإذن.</p>
+      <p id="status" class="status"></p>
+    </section>
+  </main>
+</body>
+</html>

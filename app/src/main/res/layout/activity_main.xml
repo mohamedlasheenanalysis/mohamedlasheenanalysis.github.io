@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="تطبيق التنبيهات (FCM)"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:paddingBottom="12dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="سيتم الاشتراك تلقائيًا في Topic: announcements"
+        android:paddingBottom="12dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="FCM Token:"
+        android:textStyle="bold"/>
+
+    <TextView
+        android:id="@+id/token_value"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textIsSelectable="true"
+        android:paddingTop="6dp"
+        android:paddingBottom="12dp"
+        android:text="جارِ التحميل..." />
+
+    <Button
+        android:id="@+id/copy_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="نسخ التوكن"/>
+
+</LinearLayout>
